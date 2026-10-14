@@ -1,3 +1,10 @@
+self.PathFindParams = {AgentRadius	= self.Model.HumanoidRootPart.Size.X, 
+		AgentHeight	= self.Model:GetExtentsSize().Y, 
+		AgentCanJump = 	true,
+		AgentCanClimb = true} -- THIS IS actually set up in the init function of the npc but this is just for refence if im doing something wrong with my PathfindParams!
+
+
+
 function NpcClasses:NavigateToPoint(point : Vector3)
 	local computedPath = self.Path:ComputeAsync(self.Model:GetPivot().Position, point)
 	local isPathToObjective = self.TargetObjective and true
