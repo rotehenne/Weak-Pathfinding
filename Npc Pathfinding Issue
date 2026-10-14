@@ -1,0 +1,93 @@
+function NpcClasses:NavigateToPoint(point : Vector3)
+	local computedPath = self.Path:ComputeAsync(self.Model:GetPivot().Position, point)
+	local isPathToObjective = self.TargetObjective and true
+	
+	if self.Path.Status ~= Enum.PathStatus.Success then
+		return false
+	end
+	
+	local currentWaypointIndex = 0
+	local pathBlocked = false
+	local blockedConnection
+	
+	local function disconnectBlocked() -- This Is Useless As the path never says its blocked 
+		if blockedConnection then
+			blockedConnection:Disconnect()
+			blockedConnection = nil
+		end
+	end
+	-- THIS NEVER EVER SAYS THE PATH IS BLOCKED SO its kind of a useless chunk
+	blockedConnection = self.Path.Blocked:Connect(function(blockedWaypointIndex)
+		if blockedWaypointIndex >= currentWaypointIndex then
+			pathBlocked = true
+			
+			disconnectBlocked()
+			--return false
+		end
+	end)
+	-- END of useless Chunk
+
+	for _, waypoint in ipairs(self.Path:GetWaypoints()) do
+		currentWaypointIndex = _
+
+		
+		if self.Target then  -- STOPS moving and starts shooting 
+			-- print"Self.Target: ", self.Target)
+			self:StopAndShootAtTarget()
+			disconnectBlocked()
+			return
+		end
+
+		if isPathToObjective and self.TargetObjective == nil then -- If it doesnt have an objective to go for it returns and stops walking
+			-- print"PAthToObjective = nil")
+			disconnectBlocked()
+			return
+		end
+		if self.TargetObjective then 
+			if not workspace:IsAncestorOf(self.TargetObjective) then -- if for some reason the objective ISNT in workspace
+				-- print"TARGET DOESN'T ACTUALLY EXISTS IN workspace")
+				self.TargetObjective = nil
+				--chatService:Chat(self.Model.Head, "SET TARGET OBJECTIVE TO NIL3")
+				disconnectBlocked()
+				return
+			end
+				
+
+			local capturedObjective = self:CaptureObjectiveIfCloseEnough(self.TargetObjective)
+		
+			if capturedObjective then 
+				---- print"CAPTURED, stop travelling to that points")
+				disconnectBlocked()
+				return -- If the Npc captured the point stop travelling to that specific point
+			end
+		end
+		
+		
+		
+		
+		if not self.Model:FindFirstChild("Torso") then disconnectBlocked() return end
+		
+		if waypoint.Action == Enum.PathWaypointAction.Jump then
+			self.Humanoid.Jump = true
+		end
+		
+-- It works until people start building EVEN simple things, the ai gets stuck and instead of recalculating a new path IT recalculates THE SAME ONE as it does not try to move!
+		self.Humanoid:MoveTo(waypoint.Position )-- + Vector3.new(0,self.Model.Torso.CFrame.Y,0)
+		
+		
+
+		
+		local reached = self.Humanoid.MoveToFinished:Wait()
+		
+		
+
+		
+		if not reached then
+			disconnectBlocked()
+			return false
+		end
+		
+	
+	end
+	disconnectBlocked()
+end
