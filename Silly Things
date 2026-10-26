@@ -1,0 +1,88 @@
+local character = workspace.CharactersSpawned.PlayerCharacters.ArthurMoraisProGamer
+
+
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local termite = replicatedStorage.Assets.Tools.Weapons.SpecialWeapons.SpecialMelees["Queen's Heel"]:Clone()
+local config = require(termite.Config)
+
+termite:ScaleTo(5)
+termite.Name = "Sugar Hammer"
+termite.Parent = character
+for i, child in termite:GetDescendants() do
+	if child:IsA("BasePart") or child:IsA("MeshPart")then
+		child.Color = Color3.fromRGB(255, 138, 216)
+		child.Material = Enum.Material.Neon
+		task.spawn(function()
+			while character.Humanoid.Health > 0  do
+				child.Color = Color3.fromRGB(math.random(255),math.random(255),math.random(255))
+				child.Material = Enum.Material.Neon
+				task.wait(.05)
+			end
+		end)
+	end
+end
+for i, child in character:GetChildren() do
+	if child:IsA("BasePart")  and child.Name ~= "Eyes" then
+		child.Color = Color3.fromRGB(255, 255, 255)
+
+		task.spawn(function()
+			task.wait(.05)
+	
+		end)
+	end
+end
+
+
+	termite:SetAttribute("MaxAmmo", 9999999)
+termite:SetAttribute("CurrentAmmo", 9999999)
+termite:SetAttribute("IsAutomatic",true)
+
+character:SetAttribute("FireRateBoost",100000)
+character.Humanoid.MaxHealth = 15000
+character.Humanoid.Health = 15000
+character.Humanoid.JumpPower = 50
+character:SetAttribute("BaseWalkSpeed",45)
+character:SetAttribute("ArmorBlockValue",20)
+character:SetAttribute("MaxArmor",5000)
+character:SetAttribute("CurrentArmor",5000)
+
+
+
+
+
+
+
+local s = Instance.new("Sound", character.Torso); 
+s.SoundId = "rbxassetid://90652920749503"; 
+s.RollOffMaxDistance = 800
+s.RollOffMinDistance = 80
+s.Volume = .5
+s.Looped = true
+s.PlaybackSpeed = .21
+s.RollOffMode = Enum.RollOffMode.InverseTapered
+
+local p = Instance.new("Sound", character.Torso); 
+p.SoundId = "rbxassetid://90652920749503"; 
+p.RollOffMaxDistance = 500
+p.RollOffMinDistance = 10
+p.Volume = .4
+p.PlaybackSpeed = .21
+p.RollOffMode = Enum.RollOffMode.InverseTapered
+
+
+local humanoid =  character:WaitForChild("Humanoid")
+local DEFAULT_WALK_SPEED = 16 -- The standard Roblox WalkSpeed
+
+-- Ensure the sound starts playing
+if not s.IsPlaying then
+	s:Play()
+end
+
+
+
+
+
+humanoid.Died:Connect(function()
+	p.PlaybackSpeed = math.random(40,140) *.01
+	p:Play()
+end)
